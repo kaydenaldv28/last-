@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For My beloved alyn | Surat Perpisahan</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Sacramento&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['Cormorant Garamond', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        cursive: ['Sacramento', 'cursive'],
+                    },
+                    colors: {
+                        sadDark: '#0b0f19',
+                        sadCard: 'rgba(17, 24, 39, 0.75)',
+                        sadAccent: '#e2e8f0',
+                        sadRose: '#f43f5e',
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+
+        .text-glow {
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .quote-glow {
+            box-shadow: 0 0 25px -5px rgba(244, 63, 94, 0.15);
+        }
+
+        /* Equalizer Wave Bar */
+        .eq-bar {
+            animation: eq 1.2s ease-in-out infinite alternate;
+        }
+        .eq-bar:nth-child(1) { animation-delay: 0.1s; }
+        .eq-bar:nth-child(2) { animation-delay: 0.3s; }
+        .eq-bar:nth-child(3) { animation-delay: 0.5s; }
+        .eq-bar:nth-child(4) { animation-delay: 0.2s; }
+
+        @keyframes eq {
+            0% { height: 4px; }
+            100% { height: 18px; }
+        }
+
+        .paused .eq-bar {
+            animation-play-state: paused;
+            height: 4px;
+        }
+    </style>
+</head>
+<body class="bg-sadDark text-slate-300 font-sans antialiased selection:bg-rose-900 selection:text-white min-h-screen overflow-x-hidden relative">
+
+    <!-- Canvas for Floating Particle Stars/Dust -->
+    <canvas id="particleCanvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+
+    <!-- Hidden YouTube Player Container -->
+    <div id="youtube-player" class="hidden"></div>
+
+    <!-- LANDING / START OVERLAY (To allow audio autoplay interaction) -->
+    <div id="overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-sadDark/95 backdrop-blur-md transition-opacity duration-1000 px-4">
+        <div class="text-center max-w-md mx-auto space-y-6">
+            <div class="w-16 h-16 mx-auto rounded-full bg-slate-800/80 border border-slate-700/50 flex items-center justify-center animate-pulse-slow">
+                <i data-lucide="mail-open" class="w-8 h-8 text-slate-300"></i>
+            </div>
+            <div class="space-y-2">
+                <h1 class="font-serif text-3xl md:text-4xl text-slate-100 tracking-wide">Untuk Alyn</h1>
+                <p class="font-sans text-sm text-slate-400">baca saat kamu luang yaa</p>
+            </div>
+            <p class="text-xs text-slate-500 italic max-w-xs mx-auto">
+                ada lagunya lohh
+            </p>
+            <button id="btnOpen" class="group relative inline-flex items-center gap-3 px-8 py-3.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-600/50 shadow-lg hover:shadow-rose-950/30 transition-all duration-300 font-medium tracking-wide text-sm">
+                <span>pencet disini bybuu</span>
+                <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- FLOATING MUSIC PLAYER CONTROL -->
+    <div id="musicControl" class="fixed bottom-6 right-6 z-40 opacity-0 transition-opacity duration-1000">
+        <button id="toggleMusic" class="flex items-center gap-3 bg-slate-900/90 backdrop-blur-md hover:bg-slate-800 border border-slate-700/60 text-slate-200 px-4 py-2.5 rounded-full shadow-2xl transition-all group">
+            <div id="eqContainer" class="flex items-end gap-0.5 h-5 w-4 pb-0.5 paused">
+                <span class="eq-bar w-1 bg-rose-400 rounded-full"></span>
+                <span class="eq-bar w-1 bg-rose-400 rounded-full"></span>
+                <span class="eq-bar w-1 bg-rose-400 rounded-full"></span>
+                <span class="eq-bar w-1 bg-rose-400 rounded-full"></span>
+            </div>
+            <div class="text-left hidden sm:block">
+                <p class="text-xs font-semibold leading-none text-slate-200">Sorai</p>
+                <p class="text-[10px] text-slate-400 leading-tight">Nadin Amizah</p>
+            </div>
+            <i id="musicIcon" data-lucide="pause" class="w-4 h-4 ml-1 text-slate-400 group-hover:text-white"></i>
+        </button>
+    </div>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="relative z-10 max-w-2xl mx-auto px-5 py-16 sm:py-24 space-y-12 sm:space-y-16">
+
+        <!-- HEADER SECTION -->
+        <header class="text-center space-y-4 pt-6">
+            <span class="text-xs uppercase tracking-[0.3em] text-rose-400/80 font-medium">5 Tahun Kebersamaan</span>
+            <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl text-slate-100 font-normal tracking-wide text-glow">
+                Untuk Angelyne (Alyn)
+            </h1>
+            <div class="w-12 h-[1px] bg-gradient-to-r from-transparent via-slate-500 to-transparent mx-auto pt-2"></div>
+            <p class="text-xs sm:text-sm text-slate-400 italic">Dari Imi, yang pernah menjadi rumahmu</p>
+        </header>
+
+        <!-- CONTENT PARAGRAPHS -->
+        <article class="space-y-8 text-base sm:text-lg leading-relaxed text-slate-300/90 font-light tracking-wide">
+
+            <!-- Paragraf 1 -->
+            <section class="p-6 sm:p-8 rounded-2xl bg-sadCard border border-slate-800/80 backdrop-blur-sm transition-all hover:border-slate-700/60">
+                <p>
+                    Pesan ini mungkin akan jadi pesan terakhir yang aku kirim untuk kamu. Betapa beruntungnya aku telah mengenal dirinya <span class="font-serif italic text-slate-100 font-semibold">"Angel"</span>—aku buatin nama panggilan untuk kamu yaitu <span class="text-rose-200 font-medium">Alyn</span>. 
+                </p>
+                <p class="mt-4">
+                    Hai Alyn... Alyn dimanapun kamu berada, terima kasih untuk sudah mau bersamaku melalui banyak hal yang telah kita lalui. Semua itu adalah waktu yang baik yang begitu indah untuk dikenang.
+                </p>
+            </section>
+
+            <!-- Paragraf 2 -->
+            <section class="p-6 sm:p-8 rounded-2xl bg-sadCard border border-slate-800/80 backdrop-blur-sm transition-all hover:border-slate-700/60">
+                <p>
+                    Dulu kita pernah berharap kita akan selalu bisa bersama-sama. Dulu aku merasa aku akan selama-lamanya denganmu ketika kita ketawa di atas motor dengan angin di rambut kamu pergi ke tempat kerjamu atau jalan-jalan ngelilingin kota Jakarta yang kamu sukai itu. Sama sekali aku tidak pernah berpikir bahwa kita akan berpisah, tapi itulah yang terjadi.
+                </p>
+            </section>
+
+            <!-- Paragraf 3 -->
+            <section class="p-6 sm:p-8 rounded-2xl bg-sadCard border border-slate-800/80 backdrop-blur-sm transition-all hover:border-slate-700/60">
+                <p>
+                    Alyn, dimanapun kamu berada itulah kenyataannya. Mudah-mudahan kita kuat sekuat kehidupan cinta dan pemahaman, rasa sedih dan kegagalan bukan selalu berarti kekalahan.
+                </p>
+            </section>
+
+            <!-- SPECIAL MEMORY QUOTE HIGHLIGHT -->
+            <section class="relative p-8 sm:p-10 rounded-2xl bg-gradient-to-b from-slate-900/90 to-rose-950/20 border border-rose-900/30 quote-glow my-10 text-center space-y-4">
+                <i data-lucide="quote" class="w-8 h-8 mx-auto text-rose-400/40"></i>
+                <p class="text-sm uppercase tracking-widest text-slate-400">Kenangan di atas motor</p>
+                <blockquote class="font-serif italic text-2xl sm:text-3xl text-rose-200 leading-snug">
+                    "MAU SAMA IMI TERUSS"
+                </blockquote>
+                <p class="text-sm sm:text-base text-slate-300 font-normal italic">
+                    Dulu aku ingat pas nanya di atas motor tentang cita-citamu apa dan kamu jawab kalimat itu. Terus aku jawab kalo aku juga akan selalu sama kamu terus, lalu kamu tersenyum sambil mengeratkan pelukanmu di pinggangku.
+                </p>
+            </section>
+
+            <!-- Paragraf 4 -->
+            <section class="p-6 sm:p-8 rounded-2xl bg-sadCard border border-slate-800/80 backdrop-blur-sm transition-all hover:border-slate-700/60">
+                <p>
+                    Pernyataan <span class="font-serif italic text-slate-100 font-normal">"Aku mencintaimu"</span> adalah pernyataan yang berlaku tidak hanya di hari awal kita jadian tapi juga hari ini dan selamanya.
+                </p>
+                <p class="mt-4">
+                    Sebetulnya ini adalah fase terindah dalam hidupku. Jika saat itu kita saling jatuh cinta, kebersamaan adalah hal yang penting. Tapi bagaimanapun baik aku dan kamu, kita cuma manusia dan tidak ada hubungan yang sempurna.
+                </p>
+            </section>
+
+            <!-- Paragraf 5 -->
+            <section class="p-6 sm:p-8 rounded-2xl bg-sadCard border border-slate-800/80 backdrop-blur-sm transition-all hover:border-slate-700/60">
+                <p>
+                    Dan ternyata bumi yang pernah hanya jadi milik <span class="text-slate-100 font-medium">Imi</span> dan <span class="text-rose-200 font-medium">Alyn</span> ternyata begitu luas. Kamu akan bertemu orang-orang baru dan aku rasa akupun juga begitu, meskipun tak akan pernah seistimewa kita berdua.
+                </p>
+            </section>
+
+            <!-- Paragraf 6 (Doa & Keputusan) -->
+            <section class="p-6 sm:p-8 rounded-2xl bg-sadCard border border-slate-800/80 backdrop-blur-sm transition-all hover:border-slate-700/60 space-y-4">
+                <p>
+                    Aku ingat aku pernah berdoa: <span class="italic text-slate-200">"Semoga Alyn dijauhin dari orang-orang yang ingin jahatin Alyn"</span>, dan kalau aku termasuk dari orang-orang itu, maka aku juga harus menjauh.
+                </p>
+                <p>
+                    Aku akan berbohong jika bilang aku tidak kecewa, tapi aku tidak memiliki pikiran buruk tentang hubungan cinta yang putus. Apa yang pernah kita lakukan itu tetap yang terbaik.
+                </p>
+            </section>
+
+            <!-- Paragraf 7 (Terbanglah) -->
+            <section class="p-6 sm:p-8 rounded-2xl bg-sadCard border border-slate-800/80 backdrop-blur-sm transition-all hover:border-slate-700/60 space-y-4">
+                <p>
+                    Aku pernah berharap menjadi rumah tempat kamu pulang, tapi kalau hatimu masih menganggap aku sebagai ancaman, aku tidak akan memaksamu tinggal di tempat yang tidak kamu inginkan.
+                </p>
+                <p class="text-rose-200/90 font-medium">
+                    Aku akan mendukungmu atas apapun yang kamu mau, terbanglah aku yakin sayapmu akan membantumu. Tak perlu takut, tak perlu ragu sebab jika jatuh kamu akan jatuh di pelukanku.
+                </p>
+            </section>
+
+            <!-- CLOSING SECTION -->
+            <section class="pt-8 text-center space-y-6">
+                <div class="w-16 h-[1px] bg-slate-700 mx-auto"></div>
+                <p class="font-serif text-2xl sm:text-3xl text-slate-200 leading-relaxed italic">
+                    Terima kasih Alyn.... Angelyne,<br>
+                    Sekarang yang tetap di dalam diriku adalah kenangan,<br>
+                    <span class="text-rose-300 font-semibold not-italic">Disanalah kamu selamanya.</span>
+                </p>
+                <p class="font-cursive text-3xl text-slate-400 pt-4">love you -imi-</p>
+            </section>
+
+        </article>
+
+        <!-- FOOTER -->
+        <footer class="text-center pt-12 pb-6 text-xs text-slate-600">
+            <p>© 2021 - 2026 • Kebersamaan Imi & Alyn</p>
+        </footer>
+
+    </main>
+
+    <!-- YOUTUBE IFRAME PLAYER API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Canvas Dust/Star Floating Effect
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let particles = [];
+        const particleCount = 45;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 1.8 + 0.5;
+                this.speedY = -(Math.random() * 0.3 + 0.1);
+                this.speedX = (Math.random() - 0.5) * 0.2;
+                this.opacity = Math.random() * 0.5 + 0.2;
+                this.fade = Math.random() * 0.005 + 0.002;
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+
+                if (this.y < 0 || this.x < 0 || this.x > canvas.width) {
+                    this.reset();
+                    this.y = canvas.height + 10;
+                }
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(226, 232, 240, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        animateParticles();
+
+        // YouTube Player Logic
+        let player;
+        let isPlaying = false;
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('youtube-player', {
+                height: '0',
+                width: '0',
+                videoId: 'MEq9iK3QJpY', // Sorai - Nadin Amizah
+                playerVars: {
+                    'autoplay': 0,
+                    'controls': 0,
+                    'loop': 1,
+                    'playlist': 'MEq9iK3QJpY'
+                },
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            // Player initialized and ready
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data == YT.PlayerState.PLAYING) {
+                isPlaying = true;
+                updateAudioUI(true);
+            } else if (event.data == YT.PlayerState.PAUSED || event.data == YT.PlayerState.ENDED) {
+                isPlaying = false;
+                updateAudioUI(false);
+            }
+        }
+
+        // Overlay & Audio Toggle Logic
+        const overlay = document.getElementById('overlay');
+        const btnOpen = document.getElementById('btnOpen');
+        const musicControl = document.getElementById('musicControl');
+        const toggleMusicBtn = document.getElementById('toggleMusic');
+        const eqContainer = document.getElementById('eqContainer');
+        const musicIcon = document.getElementById('musicIcon');
+
+        btnOpen.addEventListener('click', () => {
+            // Fade out overlay
+            overlay.classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 1000);
+
+            // Show Floating Music Controller
+            musicControl.classList.remove('opacity-0');
+
+            // Play Music
+            if (player && typeof player.playVideo === 'function') {
+                player.playVideo();
+            }
+        });
+
+        toggleMusicBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                player.pauseVideo();
+            } else {
+                player.playVideo();
+            }
+        });
+
+        function updateAudioUI(playing) {
+            if (playing) {
+                eqContainer.classList.remove('paused');
+                musicIcon.setAttribute('data-lucide', 'pause');
+            } else {
+                eqContainer.classList.add('paused');
+                musicIcon.setAttribute('data-lucide', 'play');
+            }
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>
